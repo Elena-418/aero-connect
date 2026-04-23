@@ -30,7 +30,23 @@ La aplicación no protege sus rutas ni autentica sus peticiones a la API.
 
 Implementa los dos ficheros que encontrarás en `core/` e intégralos en el routing y la configuración de la aplicación. Consulta el código de `AuthService` y la configuracion de stubby para entender cómo funciona la autenticación.
 
----
+
+pipes en el delay interceptor
+catchError(error:HttpResponse) =>{
+    let errorMessage:'An unexpected error ocurred'
+}
+
+loading interceptor
+if req.method==POST
+return next(req)
+
+mirar lo que es un spinner
+return next(req).pipe(
+    .finalize)
+
+    directiva go back
+
+    checkinf flow
 
 ## Ejercicio 5 — Tipos 
 

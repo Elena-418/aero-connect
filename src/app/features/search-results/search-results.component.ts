@@ -11,6 +11,8 @@ import { FlightService } from '../../core/services/flight.service';
 import { Flight, SearchParams } from '../../core/models/flight.model';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 import { CurrencyPipe, DatePipe } from '@angular/common';
+import { HeaderComponent } from '../../shared/components/header/header.component';
+
 
 @Component({
   selector: 'app-search-results',
@@ -26,6 +28,7 @@ import { CurrencyPipe, DatePipe } from '@angular/common';
     StatusBadgeComponent,
     CurrencyPipe,
     DatePipe,
+    HeaderComponent,
   ],
   templateUrl: './search-results.component.html',
   styleUrl: './search-results.component.scss',
@@ -92,8 +95,8 @@ export class SearchResultsComponent implements OnInit {
     const m = minutes % 60;
     return `${h}h ${m}m`;
   }
-
-  goBack(): void {
-    this._router.navigate(['/']);
-  }
+goBack():void{
+ this._router.navigate(['/']);
+}
+  
 }
