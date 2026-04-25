@@ -19,6 +19,7 @@ export const routes: Routes = [
       ),
   },
   {
+    //PONER RESOLVER
     path: 'booking/:id',
     loadComponent: () =>
       import('./features/booking/booking.component').then(m => m.BookingComponent),

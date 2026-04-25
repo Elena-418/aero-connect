@@ -6,7 +6,7 @@ const TOKEN_KEY = 'ac_token';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private _token = signal<string | null>(localStorage.getItem(TOKEN_KEY));
-
+//lo conviertes en booleando para ver si está autenticado o no
   isAuthenticated = computed(() => !!this._token());
 
   login(credentials: LoginRequest): void {

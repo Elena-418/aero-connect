@@ -9,29 +9,24 @@ import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const authService = inject(AuthService);
-  const authToken = authService.getToken();
+  // si voy a operar sobre la request hago un clone
+  const auth = inject(AuthService);
 
-  let newReq = req;
-
-  if (authToken) {
-    newReq = req.clone({
-      headers: req.headers.set('X-Authentication-Token', authToken),
-    });
-  }
-
-  return next(newReq).pipe(
-    catchError((error: HttpErrorResponse) => {
-      let errorMessage = 'An unexpected error occurred';
-
-      if (error.error instanceof ErrorEvent) {
-        errorMessage = `Error client: ${error.error.message}`;
-      } else {
-        errorMessage = `Error server: ${error.status}`;
+  if(auth.isAuthenticated()){
+    const r = req.clone({
+      setHeaders : {
+        "Authorizacion": "Bearer " + auth.getToken() 
       }
-
-      console.error(errorMessage);
-      return throwError(() => error);
     })
-  );
+    return next(r);
+  }
+  //pasarlo al siguiente pipe o interceptor, esto es un pasamanos, lo hay que poner siempre ya que lo pilla el http client par hacer la llamada
+  return next(req);
+
+  // si voy a operar sobre la response opero sobre la misma next
+
+
+  // return next(req);
+  // no me subscribo jamas aca, los componentes reciben este observable y se subscriben
+  // return next(req).pipe( operadores que quiera como el tap ());
 };

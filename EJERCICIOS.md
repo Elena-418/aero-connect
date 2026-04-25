@@ -8,6 +8,8 @@ Revisa también cómo se transforma la información en los templates y aplica la
 
 ---
 
+
+
 ## Ejercicio 2 — Estado con Signals y RxJS 
 
 Implementa `FlightSearchService` y úsalo en `SearchResultsComponent`.
