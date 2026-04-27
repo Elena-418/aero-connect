@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject,signal } from '@angular/core';
 import { PassengerService } from '../../../core/services/passenger.service';
 import { PassengerProfile } from '../../../core/models/passenger.model';
 
@@ -25,81 +25,83 @@ export class PassengerBookFacade {
   // Propiedades de clase planas: no hay notificación automática de cambios,
   // Angular los detecta sólo porque usa Zone.js y revisión de árbol completo.
 
-  passengers: PassengerProfile[] = [];
+  public passengers= signal<PassengerProfile[]> ([]);
 
   // Array duplicado para la vista filtrada.
   // Hay que mantenerlo sincronizado con 'passengers' manualmente.
-  filteredPassengers: PassengerProfile[] = [];
+  public filteredPassengers= signal<PassengerProfile[]>([]);
 
-  selectedPassenger: PassengerProfile | null = null;
+  public selectedPassenger= signal<PassengerProfile | null>( null);
 
   // true mientras el formulario está en modo "alta" (en lugar de edición)
-  isCreating = false;
+  public isCreating= signal (false);
 
-  isLoading = false;
-  isSaving = false;
-  error: string | null = null;
-  saveSuccess = false;
+  public isLoading = signal  (false);
+  public isSaving = signal (false);
+  // error: string | null = null;
+  public error = signal<string | null>(null);
+  public saveSuccess = signal (false);
 
   // ── ACCIONES ─────────────────────────────────────────────────────────────────
 
   loadAll(): void {
-    this.isLoading = true;
-    this.error = null;
+    this.isLoading.set(true);
+    this.error.set(null);
 
     this.passengerService.getAll().subscribe({
       next: (passengers) => {
-        this.passengers = passengers;
+        this.passengers.set(passengers);
         // Hay que inicializar filteredPassengers también aquí.
         // Si lo olvidamos, la lista empieza vacía.
-        this.filteredPassengers = passengers;
-        this.isLoading = false;
+          this.filteredPassengers.set(passengers);
+        this.isLoading.set(false);
       },
       error: () => {
-        this.error = 'No se pudieron cargar los pasajeros.';
-        this.isLoading = false;
+        this.error.set('No se pudieron cargar los pasajeros.');
+        this.isLoading.set(false);
       },
     });
   }
 
   select(passenger: PassengerProfile): void {
-    this.selectedPassenger = passenger;
-    this.isCreating = false;
-    this.error = null;
-    this.saveSuccess = false;
+    this.selectedPassenger.set(passenger);
+    this.isCreating.set(false);
+    this.error.set(null);
+    this.saveSuccess.set(false);
   }
 
   startNew(): void {
-    this.selectedPassenger = null;
-    this.isCreating = true;
-    this.error = null;
-    this.saveSuccess = false;
+    this.selectedPassenger.set(null);
+    this.isCreating.set(true);
+    this.error.set(null);
+    this.saveSuccess.set(false);
   }
 
   applyFilter(term: string): void {
     if (!term.trim()) {
       // Restaurar la lista completa cuando el filtro está vacío.
-      this.filteredPassengers = this.passengers;
+      this.filteredPassengers.set(this.passengers());
       return;
     }
     const lower = term.toLowerCase();
-    this.filteredPassengers = this.passengers.filter(
+    this.filteredPassengers.set(this.passengers().filter(
       (p) =>
         `${p.firstName} ${p.lastName}`.toLowerCase().includes(lower) ||
         p.documentNumber.toLowerCase().includes(lower) ||
         p.email.toLowerCase().includes(lower)
-    );
+    ));
   }
 
   save(data: Partial<PassengerProfile>): void {
-    this.isSaving = true;
-    this.error = null;
-    this.saveSuccess = false;
+    this.isSaving.set(true);
+    this.error.set(null);
+    this.saveSuccess.set(false);
 
-    if (this.isCreating) {
+    if (this.isCreating()) {
       this._create(data);
     } else {
-      this._update(this.selectedPassenger!.id, data);
+      //!PONER PARENTESIS
+      this._update(this.selectedPassenger()!.id, data);
     }
   }
 
@@ -107,27 +109,29 @@ export class PassengerBookFacade {
     this.passengerService.update(id, data).subscribe({
       next: (updated) => {
         // Actualizar en 'passengers' (fuente de verdad)
-        const idx = this.passengers.findIndex((p) => p.id === id);
-        if (idx !== -1) this.passengers[idx] = updated;
+        const idx = this.passengers().findIndex((p) => p.id === id);
+        //!preguntar a ivo
+
+        if (idx !== -1) this.passengers()[idx] = (updated);
 
         // Actualizar también en 'filteredPassengers' para que la vista no quede desactualizada.
         // Si olvidamos esto, el item de la lista muestra datos viejos.
-        this.filteredPassengers = this.filteredPassengers.map((p) =>
-          p.id === id ? updated : p
-        );
+      this.passengers.set([...this.passengers(),updated])
+      ;
+    
 
-        this.selectedPassenger = updated;
-        this.isSaving = false;
-        this.saveSuccess = true;
+        this.selectedPassenger.set(updated);
+        this.isSaving.set(false);
+        this.saveSuccess.set(true);
 
         // Ocultar el banner de éxito tras 3 segundos.
         // setTimeout con Zone.js funciona, pero en OnPush hay que envolverlo en NgZone.run().
         // Con signals, esto se resuelve de otra forma.
-        setTimeout(() => { this.saveSuccess = false; }, 3000);
+        setTimeout(() => { this.saveSuccess.set(false); }, 3000);
       },
       error: () => {
-        this.error = 'No se pudo guardar. Inténtalo de nuevo.';
-        this.isSaving = false;
+        this.error.set('No se pudo guardar. Inténtalo de nuevo.');
+        this.isSaving.set(false);
       },
     });
   }
@@ -137,19 +141,20 @@ export class PassengerBookFacade {
       next: (created) => {
         // Añadir el nuevo pasajero a ambos arrays.
         // Hay que recordar hacerlo en los dos sitios.
-        this.passengers = [...this.passengers, created];
-        this.filteredPassengers = [...this.filteredPassengers, created];
+        this.passengers.set([...this.passengers(), created]);
+        this.filteredPassengers.set([...this.filteredPassengers(), created]);
 
-        this.selectedPassenger = created;
-        this.isCreating = false;
-        this.isSaving = false;
-        this.saveSuccess = true;
+        this.selectedPassenger.set(created);
+        this.isCreating.set(false);
+        this.isSaving.set(false);
+        this.saveSuccess.set(true);
 
-        setTimeout(() => { this.saveSuccess = false; }, 3000);
+        setTimeout(() => { this.saveSuccess.set(false); }, 3000);
       },
       error: () => {
-        this.error = 'No se pudo crear el pasajero. Inténtalo de nuevo.';
-        this.isSaving = false;
+        this.error.set('No se pudo crear el pasajero. Inténtalo de nuevo.');
+        this.isSaving.set(false);
+
       },
     });
   }
