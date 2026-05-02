@@ -1,0 +1,11 @@
+<div class="flight-list">
+        <p class="flight-list__count">
+          {{ filteredFlights.length }} vuelo{{ filteredFlights.length !== 1 ? 's' : '' }} encontrado{{ filteredFlights.length !== 1 ? 's' : '' }}
+        </p>
+
+        @if (filteredFlights.length === 0) {
+          <div class="flight-list__empty">
+            <p>No hay vuelos disponibles con estos filtros.</p>
+          </div>
+        }
+        </div>

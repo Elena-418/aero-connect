@@ -8,14 +8,15 @@ import { AuthService } from '../services/auth.service';
 import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 
+
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   // si voy a operar sobre la request hago un clone
   const auth = inject(AuthService);
-
+//comprueba si estas loggeado, si lo estas clona la request y le añade el header de authorization con el token, si no lo estas no hace nada y la request sigue su curso normal
   if(auth.isAuthenticated()){
     const r = req.clone({
       setHeaders : {
-        "Authorizacion": "Bearer " + auth.getToken() 
+        "Authorization": "Bearer " + auth.getToken() 
       }
     })
     return next(r);

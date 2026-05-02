@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { SearchParams } from '../../../core/models/flight.model';
 import { output,input } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { GoBack } from '../../../shared/directives/goBack';
 @Component({
   selector: 'app-header',
   imports: [ MatProgressSpinnerModule,
@@ -17,7 +18,7 @@ import { DatePipe } from '@angular/common';
     MatInputModule,
     MatSelectModule,
     MatIconModule,
-  DatePipe],
+  DatePipe, GoBack],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })

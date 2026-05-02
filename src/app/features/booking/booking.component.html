@@ -15,7 +15,7 @@
             {{ flight.origin.city }} · {{ flight.destination.city }}
           </p>
           <p class="flight-summary__date">
-            {{ flight.departureDate | date:'fullDate':'':'es' }}
+            {{ flight.departureDate | date:'fullDate':'':'' }}
             · {{ flight.departureDate | date:'HH:mm' }} – {{ flight.arrivalDate | date:'HH:mm' }}
           </p>
           <p class="flight-summary__number">Vuelo {{ flight.flightNumber }}</p>

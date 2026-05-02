@@ -9,9 +9,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { FlightService } from '../../core/services/flight.service';
 import { Flight, SearchParams } from '../../core/models/flight.model';
-import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
-import { CurrencyPipe, DatePipe } from '@angular/common';
-import { HeaderComponent } from '../../shared/components/header/header.component';
+
+import { HeaderComponent } from '../flights/header/header.component';
 
 
 @Component({
@@ -25,9 +24,7 @@ import { HeaderComponent } from '../../shared/components/header/header.component
     MatSelectModule,
     MatIconModule,
     FormsModule,
-    StatusBadgeComponent,
-    CurrencyPipe,
-    DatePipe,
+  
     HeaderComponent,
   ],
   templateUrl: './search-results.component.html',
@@ -38,28 +35,13 @@ export class SearchResultsComponent implements OnInit {
   private _router = inject(Router);
   private _flightService = inject(FlightService);
 
-  flights: Flight[] = [];
+  
   isLoading = false;
   error: string | null = null;
   searchParams!: SearchParams;
 
   // Filtros inline (estos irán a FlightFiltersComponent)
-  maxPrice: number | null = null;
-  sortBy: 'price' | 'departure' | 'duration' = 'price';
-
-  get filteredFlights(): Flight[] {
-    let result = [...this.flights];
-    if (this.maxPrice !== null) {
-      result = result.filter(f => f.basePrice <= this.maxPrice!);
-    }
-    result.sort((a, b) => {
-      if (this.sortBy === 'price') return a.basePrice - b.basePrice;
-      if (this.sortBy === 'departure') return a.departureDate.localeCompare(b.departureDate);
-      return a.durationMinutes - b.durationMinutes;
-    });
-    return result;
-  }
-
+ 
   ngOnInit(): void {
     const qp = this._route.snapshot.queryParams;
     this.searchParams = {
@@ -89,7 +71,7 @@ export class SearchResultsComponent implements OnInit {
   bookFlight(flight: Flight): void {
     this._router.navigate(['/booking', flight.id]);
   }
-
+//en la card en forma de pipe
   formatDuration(minutes: number): string {
     const h = Math.floor(minutes / 60);
     const m = minutes % 60;
